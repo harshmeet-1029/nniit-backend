@@ -1,0 +1,65 @@
+{
+	"info": {
+		"_postman_id": "2e090f27-3dd3-40cf-9f77-12e0b9669ccf",
+		"name": "nniit-backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "27733504"
+	},
+	"item": [
+		{
+			"name": "Post Flashcard",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"student_id\": \"stu001\",\n  \"question\": \"What is Newton's Second Law?\",\n  \"answer\": \"Force equals mass times acceleration\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8000/api/v1/flashcards/flashcard"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Flashcard",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/v1/flashcards/get-subject?student_id=stu001&limit=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"v1",
+						"flashcards",
+						"get-subject"
+					],
+					"query": [
+						{
+							"key": "student_id",
+							"value": "stu001"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

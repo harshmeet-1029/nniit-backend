@@ -1,56 +1,130 @@
 # Smart Flashcard Backend
 
-A scalable backend for a smart flashcard system using Express.js, MongoDB, and a rule-based subject classifier.
+A scalable backend for a smart flashcard system using Express.js, MongoDB, and a context-aware rule-based subject classifier. Designed for class 1–10 subjects, with robust security and easy extensibility.
+
+---
+
+## Table of Contents
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+  - [1. Install Node.js](#1-install-nodejs)
+  - [2. Install Yarn](#2-install-yarn)
+  - [3. Install MongoDB](#3-install-mongodb)
+    - [Option A: Local MongoDB](#option-a-local-mongodb)
+    - [Option B: MongoDB Atlas (Cloud)](#option-b-mongodb-atlas-cloud)
+    - [MongoDB Compass (GUI)](#mongodb-compass-gui)
+- [Project Setup](#project-setup)
+- [Environment Variables](#environment-variables)
+- [Running the Server](#running-the-server)
+- [API Endpoints](#api-endpoints)
+- [Extending the Subject Classifier](#extending-the-subject-classifier)
+- [Troubleshooting](#troubleshooting)
+
+---
 
 ## Features
-- Add flashcards with automatic subject inference (Physics, Biology, Chemistry, Math, etc.)
+- Add flashcards with automatic subject inference (covers all major subjects from class 1–10)
 - Retrieve mixed flashcards by subject for a student, with pagination and shuffling
-- Secure, production-ready setup (helmet, rate limiting, CORS)
-- Highly optimized and extensible subject classifier
+- Secure, production-ready setup (helmet, express-rate-limit, CORS)
+- Highly optimized and extensible subject classifier (phrase-first, then keyword matching)
+- Request logging and centralized error handling
 
-## Project Structure
-```
-src/
-  server.js
-  app.js
-  db/
-    index.js
-  models/
-    flashcard.model.js
-  routes/
-    flashcard.route.js
-  utils/
-    subjectClassifier.util.js
-.env
-README.md
-```
+---
 
-## Setup
+## Prerequisites
+- **Node.js** (v18 or later recommended)
+- **Yarn** (package manager)
+- **MongoDB** (local or cloud)
+
+---
+
+## Installation
+
+### 1. Install Node.js
+- Download and install Node.js from [nodejs.org](https://nodejs.org/)
+- Verify installation:
+  ```bash
+  node -v
+  npm -v
+  ```
+
+### 2. Install Yarn
+- Install Yarn globally:
+  ```bash
+  npm install -g yarn
+  ```
+- Verify installation:
+  ```bash
+  yarn -v
+  ```
+
+### 3. Install MongoDB
+
+#### Option A: Local MongoDB
+- Download MongoDB Community Server from [mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
+- Install and follow the setup instructions for your OS
+- Start the MongoDB server:
+  - On Windows: Run `mongod` from the command prompt
+  - On macOS/Linux: Run `mongod` in your terminal
+- By default, MongoDB runs at `mongodb://127.0.0.1:27017`
+
+#### Option B: MongoDB Atlas (Cloud)
+- Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) and create a free account
+- Create a new cluster (free tier is fine)
+- Add a database user and set a password
+- Whitelist your IP address (or allow access from anywhere for development)
+- Get your connection string (e.g., `mongodb+srv://<username>:<password>@cluster0.mongodb.net/<dbname>?retryWrites=true&w=majority`)
+
+#### MongoDB Compass (GUI) [Recommended]
+- [MongoDB Compass](https://www.mongodb.com/products/compass) is a free, official GUI for MongoDB.
+- Download and install Compass from [mongodb.com/products/compass](https://www.mongodb.com/products/compass).
+- Use Compass to visually explore, query, and manage your MongoDB data.
+- You can connect Compass to your local MongoDB (`mongodb://127.0.0.1:27017`) or to your Atlas cluster (paste your connection string).
+- Compass is highly recommended for beginners to easily view and edit your database collections and documents.
+
+---
+
+## Project Setup
 1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd nniit-backend
+   ```
 2. **Install dependencies**
    ```bash
    yarn install
    ```
-3. **Configure environment variables**
-   - Create a `.env` file in the root directory:
-     ```env
-     PORT=8000
-     MONGODB_URI=your_mongodb_connection_string_here
-     ```
-   - Set your MongoDB URI. The default port is 8000.
-4. **Run the server**
-   - For development (with auto-reload):
-     ```bash
-     yarn nodemon src/server.js
-     ```
-   - For production:
-     ```bash
-     node src/server.js
-     ```
+
+---
+
+## Environment Variables
+Create a `.env` file in the project root:
+```env
+PORT=8000
+MONGODB_URI=your_mongodb_connection_string_here
+```
+- For local MongoDB, use: `MONGODB_URI=mongodb://127.0.0.1:27017/nniit-flashcards`
+- For Atlas, use the connection string you copied from the Atlas dashboard
+
+---
+
+## Running the Server
+- **Development (with auto-reload):**
+  ```bash
+  yarn nodemon src/server.js
+  ```
+- **Production:**
+  ```bash
+  node src/server.js
+  ```
+- The server will start at [http://localhost:8000](http://localhost:8000)
+
+---
 
 ## API Endpoints
 
-### Add Flashcard (with Subject Inference)
+### 1. Add Flashcard (with Subject Inference)
 - **POST** `/api/v1/flashcards/flashcard`
 - **Body:**
   ```json
@@ -67,8 +141,18 @@ README.md
     "subject": "Physics"
   }
   ```
+- **Test with curl:**
+  ```bash
+  curl -X POST http://localhost:8000/api/v1/flashcards/flashcard \
+    -H "Content-Type: application/json" \
+    -d '{
+      "student_id": "stu001",
+      "question": "What is Newton'\''s Second Law?",
+      "answer": "Force equals mass times acceleration"
+    }'
+  ```
 
-### Get Mixed Flashcards by Subject
+### 2. Get Mixed Flashcards by Subject
 - **GET** `/api/v1/flashcards/get-subject?student_id=stu001&limit=5`
 - **Response:**
   ```json
@@ -85,11 +169,30 @@ README.md
     }
   ]
   ```
-
-## Notes
-- The subject classifier is rule-based and can be extended in `src/utils/subjectClassifier.util.js`.
-- Make sure MongoDB is running and accessible from your connection string.
+- **Test with curl:**
+  ```bash
+  curl "http://localhost:8000/api/v1/flashcards/get-subject?student_id=stu001&limit=5"
+  ```
 
 ---
 
-**For any issues, please check your .env configuration and MongoDB connection.**
+## Extending the Subject Classifier
+- To add more subjects or keywords/phrases, edit `src/utils/subjectClassifier.util.js`.
+- Add new entries to the `SUBJECT_PHRASES` and `SUBJECT_KEYWORDS` maps.
+- The classifier checks for phrases first, then keywords, and always assigns a subject (never "General").
+
+---
+
+## Troubleshooting
+- **MongoDB connection errors:**
+  - Make sure MongoDB is running (local) or your Atlas URI is correct.
+  - Check your `.env` file for typos.
+- **Port already in use:**
+  - Change the `PORT` in your `.env` file or stop the process using the port.
+- **Other issues:**
+  - Check the logs in your terminal for error messages.
+  - Ensure all dependencies are installed with `yarn install`.
+
+---
+
+**For any questions or issues, please open an issue or contact the maintainer.**
