@@ -113,7 +113,7 @@ nniit-backend/
 ## Project Setup
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/harshmeet-1029/nniit-backend
    cd nniit-backend
    ```
 2. **Install dependencies**
