@@ -6,6 +6,7 @@ A scalable backend for a smart flashcard system using Express.js, MongoDB, and a
 
 ## Table of Contents
 - [Features](#features)
+- [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
   - [1. Install Node.js](#1-install-nodejs)
@@ -13,7 +14,7 @@ A scalable backend for a smart flashcard system using Express.js, MongoDB, and a
   - [3. Install MongoDB](#3-install-mongodb)
     - [Option A: Local MongoDB](#option-a-local-mongodb)
     - [Option B: MongoDB Atlas (Cloud)](#option-b-mongodb-atlas-cloud)
-    - [MongoDB Compass (GUI)](#mongodb-compass-gui)
+    - [MongoDB Compass (GUI) [Recommended]](#mongodb-compass-gui-recommended)
 - [Project Setup](#project-setup)
 - [Environment Variables](#environment-variables)
 - [Running the Server](#running-the-server)
@@ -29,6 +30,30 @@ A scalable backend for a smart flashcard system using Express.js, MongoDB, and a
 - Secure, production-ready setup (helmet, express-rate-limit, CORS)
 - Highly optimized and extensible subject classifier (phrase-first, then keyword matching)
 - Request logging and centralized error handling
+
+---
+
+## Project Structure
+```
+nniit-backend/
+│
+├── src/
+│   ├── server.js                    # Entry point: loads env, connects DB, starts server
+│   ├── app.js                       # Express app setup (helmet, rate limiter, routes, error handler)
+│   ├── db/
+│   │   └── index.js                 # MongoDB connection logic
+│   ├── models/
+│   │   └── flashcard.model.js       # Mongoose schema for flashcards
+│   ├── routes/
+│   │   └── flashcard.route.js       # Flashcard endpoints (POST/GET)
+│   ├── utils/
+│   │   └── subjectClassifier.util.js# Optimized subject classifier
+│
+├── .env                             # Environment variables (MongoDB URI, PORT)
+├── package.json
+├── yarn.lock
+└── README.md                        # Project documentation
+```
 
 ---
 
@@ -192,7 +217,3 @@ MONGODB_URI=your_mongodb_connection_string_here
 - **Other issues:**
   - Check the logs in your terminal for error messages.
   - Ensure all dependencies are installed with `yarn install`.
-
----
-
-**For any questions or issues, please open an issue or contact the maintainer.**
